@@ -1,0 +1,105 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>uk.co.diffa</groupId>
+	<artifactId>metrics.servlet.activator</artifactId>
+	<packaging>bundle</packaging>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>Metrics Servlet Activator</name>
+	<description>Registers the Metrics servlets through the Felix HTTP whiteboard</description>
+
+	<properties>
+		<metrics.version>2.1.3</metrics.version>
+		<jackson.version>1.9.5</jackson.version>
+	</properties>
+
+	<dependencies>
+	
+		<dependency>
+			<groupId>com.yammer.metrics</groupId>
+			<artifactId>metrics-core</artifactId>
+			<version>${metrics.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.yammer.metrics</groupId>
+			<artifactId>metrics-servlet</artifactId>
+			<version>${metrics.version}</version>
+		</dependency>
+
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        
+        <!-- This needs to be explicitly declared for embedding - could be included as transitive dependency otherwise  -->
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        
+        <!-- Provided Dependencies -->     
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<version>1.4.0</version>
+			<scope>provided</scope>
+		</dependency>
+		
+	</dependencies>
+
+	<build>
+	
+		<plugins>
+		
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Bundle-Activator>uk.co.diffa.metrics.activator.Activator</Bundle-Activator>
+						<Export-Package>com.yammer.metrics,
+							com.yammer.metrics.core,
+							com.yammer.metrics.util;version="${metrics.version}"</Export-Package>
+						<Embed-Dependency>metrics-servlet,metrics-core,jackson-core-asl,jackson-mapper-asl</Embed-Dependency>
+					</instructions>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.sling</groupId>
+				<artifactId>maven-sling-plugin</artifactId>
+				<version>2.0.4-incubator</version>
+				<configuration>
+					<slingUrl>http://localhost:5502</slingUrl>
+					<slingUrlSuffix>/apps/zg/install</slingUrlSuffix>
+					<user>admin</user>
+					<password>admin</password>
+					<usePut>true</usePut>
+					<failOnError>true</failOnError>
+				</configuration>
+				<executions>
+					<execution>
+						<id>install-bundle</id>
+						<goals>
+							<goal>install</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
+		</plugins>
+		
+	</build>
+
+</project>
